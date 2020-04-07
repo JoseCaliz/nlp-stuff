@@ -80,7 +80,7 @@ total_labels = data['Author'].str.replace(' ', '').to_list()
 train_sentences, test_sentences, train_labels, test_labels = train_test_split(
     total_sentences, total_labels, test_size=0.2, random_state=1234)
 
-sentence_tokenizer = Tokenizer(oov_token="<OOV>")
+sentence_tokenizer = Tokenizer(num_words=40000, oov_token="<OOV>")
 label_tokenizer = Tokenizer()
 
 train_tokenizer.fit_on_texts(train_sentences)
@@ -126,10 +126,6 @@ training_labels = np.array(train_labels_sequences)
 testing_padded = np.array(test_sentences_padded)
 testing_labels = np.array(test_labels_sequences)
 
-history = model.fit(training_padded, training_labels, epochs=num_epochs,
-                    validation_data=(testing_padded, testing_labels),
-                    verbose=1)
-
 
 def genearte_array(i):
     t = np.zeros(4)
@@ -139,5 +135,9 @@ def genearte_array(i):
 
 matrix_train = np.array([genearte_array(train_labels_sequences[i][0]) for i in
                          range(len(train_labels_sequences))])
+matrix_test = np.array([genearte_array(test_labels_sequences[i][0]) for i in
+                        range(len(test_labels_sequences))])
 
-matrix.shape
+history = model.fit(training_padded, matrix_train, epochs=num_epochs,
+                    validation_data=(testing_padded, matrix_test),
+                    verbose=1)
