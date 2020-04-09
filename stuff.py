@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import re
 import pandas as pd
 from unidecode import unidecode
@@ -108,7 +109,7 @@ test_sentences_padded = pad_sequences(
     padding=padding_type
 )
 
-vocab_size = len(word_index_sentence.keys())
+vocab_size = 40000
 model = tf.keras.Sequential([
     tf.keras.layers.Embedding(vocab_size, embedding_dim,
                               input_length=max_sequence_size),
@@ -141,3 +142,13 @@ matrix_test = np.array([genearte_array(test_labels_sequences[i][0]) for i in
 history = model.fit(training_padded, matrix_train, epochs=num_epochs,
                     validation_data=(testing_padded, matrix_test),
                     verbose=1)
+
+
+fig, ax = plt.subplots()
+ax.plot(history.history['accuracy'])
+ax.plot(history.history['val_accuracy'])
+
+
+fig, ax = plt.subplots()
+ax.plot(history.history['loss'])
+ax.plot(history.history['val_loss'])
