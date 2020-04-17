@@ -1,3 +1,4 @@
+from pandas.compat import u
 import matplotlib.pyplot as plt
 import re
 import numpy as np
@@ -12,6 +13,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation as LDiA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.naive_bayes import BernoulliNB
+from sklearn.ensemble import RandomForestClassifier
 
 # TODO hide the names and load them from CSV
 # Remove the real names
@@ -94,7 +96,7 @@ vocabulario = counter.vocabulary_.values()
 column_nums, terms = zip(*sorted(zip(counter.vocabulary_.values(),
                                      counter.vocabulary_.keys())))
 bow_vector.columns = terms
-ldia = LDiA(n_components=100,  learning_method='batch')
+ldia = LDiA(n_components=30,  learning_method='batch')
 topic_vectors = ldia.fit_transform(bow_vector)
 
 # Split
@@ -106,16 +108,24 @@ for i in range(4):
                                                         test_size=0.3)
 
     # Do the LDA
-    # lda = LDA(n_components=1)
-    lda = BernoulliNB()
+    lda = LDA(n_components=1)
     lda.fit(X_train, y_train)
     y_pred = lda.predict(X_test)
 
     results_train.append(round(float(lda.score(X_train, y_train)), 2))
     results_test.append(round(float(lda.score(X_test, y_test)), 2))
+    print(i)
 
 print(results_train)
 print(results_test)
 
 results = dict(zip(classnames, results))
-results
+topic_vector_df = pd.DataFrame(ldia.components_.T, index=terms)
+topic_vector_df[10].nlargest(20)
+
+
+data = [u'\\x96 Jose caliz']
+data[0].decode('utf-8')
+
+no_unicode = pd.Series(['Steve', 'Jason', 'Jake'])
+#yes_unicode = pd.Series(['tea', 'caf\xe9', 'beer'])
