@@ -1,3 +1,5 @@
+import sys
+import matplotlib.pyplot as plt
 from sys import getsizeof
 import pandas as pd
 import numpy as np
@@ -87,19 +89,19 @@ def pad_trunc(t, maxlen):
 # np.save('./nlp/saved_states/y.pkl', y)
 
 X = np.load('./nlp/saved_states/X.pkl.npy')
-y = np.load('./nlp/saved_states/y.pkl.npy')
+y = np.load('./nlp/saved_states/y.pkl.npy')[:, 0]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y)
 
 maxlen = 15
 batch_size = 32
 embedding_dims = 300
-filters = 300
-kernel_size = 3
-hidden_dims = 250
-epochs = 2
-model = Sequential()
+filters = 50
+kernel_size = 4
+hidden_dims = 25
+epochs = 10
 
+model = Sequential()
 model.add(Conv1D(
     filters,
     kernel_size,
@@ -113,12 +115,12 @@ model.add(GlobalMaxPooling1D())
 model.add(Dense(hidden_dims))
 model.add(Dropout(0.2))
 model.add(Activation('relu'))
-model.add(Dense(4))
-model.add(Activation('softmax'))
+model.add(Dense(1))
+model.add(Activation('sigmoid'))
 
-model.compile(loss='categorical_crossentropy',
+model.compile(loss='binary_crossentropy',
               optimizer='adam',
-              metrics=[accuracy, categorical_accuracy])
+              metrics=['accuracy'])
 
 
 history = model.fit(X_train, y_train,
@@ -126,4 +128,10 @@ history = model.fit(X_train, y_train,
                     epochs=10,
                     validation_data=(X_test, y_test))
 
-X[0]
+
+plt.plot(history.history['accuracy'])
+ax = plt.gca()
+ax.plot(history.history['val_accuracy'])
+
+
+sys.modules[__name__].__dict__.clear()
